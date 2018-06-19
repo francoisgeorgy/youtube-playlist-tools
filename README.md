@@ -52,3 +52,7 @@ https://stackoverflow.com/questions/44777670/how-to-list-watch-later-list-in-api
 
     sudo -E pip3 install --upgrade google-api-python-client
     
+See also:
+
+- https://stackoverflow.com/questions/43713836/how-to-implement-google-api-with-react-redux-and-webpack
+- https://gist.github.com/mikecrittenden/28fe4877ddabff65f589311fd5f8655c
