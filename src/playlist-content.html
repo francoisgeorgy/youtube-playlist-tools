@@ -33,7 +33,7 @@
     <script>
 
         var urlParams = new URLSearchParams(window.location.search);
-        var playlistID = urlParams.get('id')
+        var playlistID = urlParams.get('id');
         // console.log(playlistID);
 
         var playlistItems = [];
@@ -63,7 +63,10 @@
             clearData();
             print(`${playlistItems.length} videos`);
             for(item of playlistItems) {
-                print(`<button type="button" onclick="removeVideo('${item.id}')">remove</button> <a href="https://www.youtube.com/watch?v=${item.videoId}" target="v" title="${item.description}">${item.title}</a>`);
+                // console.log(item.id, item.videoId);
+                print(`<button type="button" onclick="removeVideo('${item.id}')">remove</button>
+                    <button type="button" onclick="moveToPlaylist('${item.id}', '${item.videoId}','playlist_id')">move</button>
+                    <a href="https://www.youtube.com/watch?v=${item.videoId}" target="v" title="${item.description}">${item.title}</a>`);
             }
         }
 
@@ -122,7 +125,6 @@
         function deleteError(error) {
             console.log(error);
             $('#error').text(`${error.code} ${error.message}`);
-            console.log(playlistItems);
         }
 
         function removeVideo(id) {
@@ -130,6 +132,71 @@
             if (!id) return;
             let request = buildApiRequest('DELETE', '/youtube/v3/playlistItems', {'id': id});
             executeRequest(request, function f(){deleteSuccess(id)}, deleteError);
+        }
+
+        function insertSuccess(id) {    // item's id in "from" list
+            console.log('insert success', id);
+            removeVideo(id);
+        }
+
+        function insertError(error) {
+            console.log('insert error', error);
+            $('#error').text(`${error.code} ${error.message}`);
+        }
+
+        /*
+         * https://developers.google.com/youtube/v3/docs/playlistItems/insert
+         * API response
+        {
+            "kind": "youtube#playlistItem",
+            "etag": "\"DuHzAJ-eQIiCIp7p4ldoVcVAOeY/8YdpIy9evzk5AZJhB4sYkvkwBMQ\"",
+            "id": "UExfeDhNcFV5cHhlYjVZeGdXTXB0a0MwM3MzWWNEQk5FZC41MjE1MkI0OTQ2QzJGNzNG",
+            "snippet": {
+            "publishedAt": "2018-06-19T13:41:29.000Z",
+                "channelId": "UCE0q36_agQAeb4G3PXivkew",
+                "title": "Hitler uses git",
+                "description": "Hitler learns about git. The hard way.",
+                "thumbnails": {
+                "default": {
+                    "url": "https://i.ytimg.com/vi/CDeG4S-mJts/default.jpg",
+                        "width": 120,
+                        "height": 90
+                },
+                "medium": {
+                    "url": "https://i.ytimg.com/vi/CDeG4S-mJts/mqdefault.jpg",
+                        "width": 320,
+                        "height": 180
+                },
+                "high": {
+                    "url": "https://i.ytimg.com/vi/CDeG4S-mJts/hqdefault.jpg",
+                        "width": 480,
+                        "height": 360
+                }
+            },
+            "channelTitle": "François Georgy",
+                "playlistId": "PL_x8MpUypxeb5YxgWMptkC03s3YcDBNEd",
+                "resourceId": {
+                "kind": "youtube#video",
+                    "videoId": "CDeG4S-mJts"
+            }
+        }
+        }
+         */
+        function moveToPlaylist(id, videoId, playlistId) {
+            console.log("moveToPlaylist", id, videoId, playlistId);
+            let request = buildApiRequest(
+                'POST',
+                '/youtube/v3/playlistItems',
+                {
+                    'part': 'snippet',
+                    'onBehalfOfContentOwner': ''
+                }, {
+                    'snippet.playlistId': 'PL_x8MpUypxeZLOTPEtCpOfXaNKFakaiJQ', // playlistId,
+                    'snippet.resourceId.kind': 'youtube#video',
+                    'snippet.resourceId.videoId': videoId,
+                    'snippet.position': ''
+                });
+            executeRequest(request, function f(){insertSuccess(id)}, insertError);
         }
 
         // method called by auth.js after authentication

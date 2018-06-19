@@ -117,8 +117,8 @@
 
     function executeRequest(request, callback, callbackError) {
         console.log("executeRequest");
-        let r = request.execute(function(data) {
-            console.log(data);
+        request.execute(function(data) {
+            // console.log(data);
             if (data) {
                 if (data.error) {
                     console.warn(`${data.error.code} ${data.error.message}`);

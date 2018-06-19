@@ -2,6 +2,7 @@
 src/secrets.js
 secret/
 .idea/
+*.iml
 
 # Created by .ignore support plugin (hsz.mobi)
 ### Python template
