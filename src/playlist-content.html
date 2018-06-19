@@ -2,6 +2,7 @@
 <head>
     <title>Google APIs - Sample JS Page</title>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="secrets.js"></script>
     </head>
 <body>
     <pre id="data"></pre>
@@ -34,7 +35,7 @@
             // 'scope' field specifies space-delimited list of access scopes
 
             gapi.client.init({
-                'clientId': '___CLIENT_ID___',
+                'clientId': SECRETS.client_id,
                 'discoveryDocs': ['https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest'],
                 'scope': 'https://www.googleapis.com/auth/youtube.force-ssl https://www.googleapis.com/auth/youtubepartner'
             }).then(function () {
@@ -47,7 +48,7 @@
                 setSigninStatus();
 
                 // Call handleAuthClick function when user clicks on "Authorize" button.
-                $('#execute-request-button').click(function () {
+                $('#execute-request-button').click(function(event) {
                     console.log("execute-request-button");
                     handleAuthClick(event);
                 });
@@ -183,7 +184,7 @@
             for(item of a) {
                 // console.log(item.snippet.title);
                 // print(`<a href="playlist-content.html?id=${item.id}">${item.title}</a>`);
-                print(`${item.title}</a>);
+                print(`${item.title}</a>`);
             }
         }
 

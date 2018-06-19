@@ -2,6 +2,7 @@
 <head>
     <title>Google APIs - Sample JS Page</title>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script src="secrets.js"></script>
     </head>
 <body>
     <pre id="data"></pre>
@@ -30,7 +31,7 @@
             // 'scope' field specifies space-delimited list of access scopes
 
             gapi.client.init({
-                'clientId': '___CLIENT_ID___',
+                'clientId': SECRETS.client_id,
                 'discoveryDocs': ['https://www.googleapis.com/discovery/v1/apis/youtube/v3/rest'],
                 'scope': 'https://www.googleapis.com/auth/youtube.force-ssl https://www.googleapis.com/auth/youtubepartner'
             }).then(function () {
@@ -43,7 +44,7 @@
                 setSigninStatus();
 
                 // Call handleAuthClick function when user clicks on "Authorize" button.
-                $('#execute-request-button').click(function () {
+                $('#execute-request-button').click(function(event) {
                     console.log("execute-request-button");
                     handleAuthClick(event);
                 });
@@ -118,10 +119,14 @@
             console.log("executeRequest");
             request.execute(function (data) {
                 console.log(data);
-                handleData(data);
-                if (data.nextPageToken) {
-                    console.log('get next page', data.nextPageToken);
-                    defineRequest(data.nextPageToken);
+                if (data.error) {
+                    print(`${data.error.code} ${data.error.message}`);
+                } else {
+                    handleData(data);
+                    if (data.nextPageToken) {
+                        console.log('get next page', data.nextPageToken);
+                        defineRequest(data.nextPageToken);
+                    }
                 }
             });
         }
@@ -159,6 +164,7 @@
                 'GET',
                 '/youtube/v3/playlists',
                 {
+                    // 'channelId': 'UCE0q36_agQAeb4G3PXivkew',
                     'mine': 'true',
                     'maxResults': '50',
                     'part': 'snippet,contentDetails',
@@ -222,7 +228,7 @@
 
     <button id="execute-request-button">Authorize</button>
 
-    <script src="https://apis.google.com/js/api.js?onload=handleClientLoad"></script>
+    <script defer src="https://apis.google.com/js/api.js?onload=handleClientLoad"></script>
 
     <!-- script async defer src="https://apis.google.com/js/api.js"
             onload="this.onload=function(){console.log('onload');};handleClientLoad()"
