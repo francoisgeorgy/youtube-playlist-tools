@@ -115,19 +115,26 @@
         return params;
     }
 
-    function executeRequest(request, callback) {
+    function executeRequest(request, callback, callbackError) {
         console.log("executeRequest");
-        request.execute(function (data) {
-            // console.log(data);
-            if (data.error) {
-                print(`${data.error.code} ${data.error.message}`);
+        let r = request.execute(function(data) {
+            console.log(data);
+            if (data) {
+                if (data.error) {
+                    console.warn(`${data.error.code} ${data.error.message}`);
+                    if (callbackError) {
+                        callbackError(data.error);
+                    }
+                } else {
+                    // console.log('executeRequest calling callback');
+                    if (callback) callback(data);
+                    // if (data.nextPageToken) {
+                    //     console.log('get next page', data.nextPageToken);
+                    //     defineRequest(data.nextPageToken);
+                    // }
+                }
             } else {
-                // console.log('executeRequest calling callback');
-                callback(data);
-                // if (data.nextPageToken) {
-                //     console.log('get next page', data.nextPageToken);
-                //     defineRequest(data.nextPageToken);
-                // }
+                if (callback) callback();
             }
         });
     }

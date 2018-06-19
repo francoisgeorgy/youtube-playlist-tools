@@ -1,6 +1,22 @@
 <html>
 <head>
     <title>Content of playlist</title>
+    <style>
+        body {
+            font-size: 10pt;
+        }
+        a {
+            text-decoration: none;
+        }
+        button {
+            padding: 0 2px;
+            font-size: 0.8em;
+        }
+        #data {
+            font-family: sans-serif;
+            line-height: 15pt;
+        }
+    </style>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="auth.js"></script>
     <script src="secrets.js"></script>
@@ -12,7 +28,8 @@
     </div>
     <h3 id="playlist-title"></h3>
     <div id="playlist-description"></div>
-    <pre id="data"></pre>
+    <div id="error"></div>
+    <div id="data"></div>
     <script>
 
         var urlParams = new URLSearchParams(window.location.search);
@@ -23,16 +40,11 @@
 
         function clearData() {
             $('#data').html('');
+            $('#error').html('');
         }
 
         function print(s) {
-            $('#data').append(`${s}\n`);
-        }
-
-        function printList(a) {
-            for(item of a) {
-                print(`<a href="https://www.youtube.com/watch?v=${item.videoId}" target="v" title="${item.description}">${item.title}</a>`);
-            }
+            $('#data').append(`${s}<br />`);
         }
 
         function displayPlaylistInfo(infos) {
@@ -45,6 +57,14 @@
             console.log("playlistInfoRequest");
             let request = buildApiRequest('GET', '/youtube/v3/playlists', {'id': id, 'part': 'snippet,contentDetails'});
             executeRequest(request, displayPlaylistInfo);
+        }
+
+        function printListItems() {
+            clearData();
+            print(`${playlistItems.length} videos`);
+            for(item of playlistItems) {
+                print(`<button type="button" onclick="removeVideo('${item.id}')">remove</button> <a href="https://www.youtube.com/watch?v=${item.videoId}" target="v" title="${item.description}">${item.title}</a>`);
+            }
         }
 
         function displayPlaylistContent(data) {
@@ -69,9 +89,7 @@
                 }
             );
 
-            clearData();
-            print(`${playlistItems.length} videos`);
-            printList(playlistItems);
+            printListItems();
 
             if (data.nextPageToken) {
                 console.log('get next page', data.nextPageToken);
@@ -91,6 +109,27 @@
                     'pageToken': nextPageToken
                 });
             executeRequest(request, displayPlaylistContent);
+        }
+
+        function deleteSuccess(id) {
+            console.log('delete success', id);
+            let i = playlistItems.findIndex(function f(e) { return e.id === id; });
+            console.log(i);
+            playlistItems.splice(i, 1);
+            printListItems();
+        }
+
+        function deleteError(error) {
+            console.log(error);
+            $('#error').text(`${error.code} ${error.message}`);
+            console.log(playlistItems);
+        }
+
+        function removeVideo(id) {
+            console.log("removeVideo", id);
+            if (!id) return;
+            let request = buildApiRequest('DELETE', '/youtube/v3/playlistItems', {'id': id});
+            executeRequest(request, function f(){deleteSuccess(id)}, deleteError);
         }
 
         // method called by auth.js after authentication

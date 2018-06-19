@@ -2,7 +2,20 @@
 <head>
     <title>List of playlists</title>
     <style>
-        a { text-decoration: none; }
+        body {
+            font-size: 10pt;
+        }
+        a {
+            text-decoration: none;
+        }
+        button {
+            padding: 0 2px;
+            font-size: 0.8em;
+        }
+        #data {
+            font-family: sans-serif;
+            line-height: 15pt;
+        }
     </style>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="auth.js"></script>
@@ -10,17 +23,22 @@
     </head>
 <body>
     <button id="execute-request-button">Authorize</button>
-    <pre id="data"></pre>
+    <div>
+        <a href="playlists-list.html">back to playlists</a>
+    </div>
+    <div id="error"></div>
+    <div id="data"></div>
     <script>
 
         var playlists = [];
 
         function clearData() {
             $('#data').html('');
+            $('#error').html('');
         }
 
         function print(s) {
-            $('#data').append(`${s}\n`);
+            $('#data').append(`${s}<br />`);
         }
 
         function printList(a) {
